@@ -5,8 +5,6 @@ const Favorite = require('../models').Favorite;
 module.exports = {
     async fetch(req, res) {
         const userId = req.params.user_id;
-        const productId = req.body.product_id;
-        const favorited = req.body.favorited;
 
         const user = await User.findByPk(userId, {
             include: [

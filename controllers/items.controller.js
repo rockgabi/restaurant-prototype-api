@@ -1,10 +1,10 @@
-const Product = require('../models').Product;
+const Item = require('../models').OrderItem;
 
 module.exports = {
     fetch(req, res) {
-        return Product.findAll()
-            .then(products => {
-                res.status(200).send(products);
+        return Item.findAll()
+            .then(items => {
+                res.status(200).send(items);
             })
             .catch(error => {
                 res.status(400).send(error);
@@ -13,9 +13,9 @@ module.exports = {
     create(req, res) {
         const data = Object.assign({}, req.body);
 
-        return Product.create(data)
-            .then(product => {
-                res.status(201).send(product);
+        return Item.create(data)
+            .then(item => {
+                res.status(201).send(item);
             })
             .catch(error => {
                 res.status(400).send(error);
@@ -23,26 +23,24 @@ module.exports = {
     },
     update(req, res) {
         const id = req.params.id;
-        const password = req.body.password && req.body.password != "" ? bcrypt.hashSync(req.body.password, 10) : "";
-        const data = Object.assign({}, req.body, { password });
-        delete data.id;
+        const data = Object.assign({}, req.body);
 
-        return Product.update(
+        return Item.update(
             data,
             { where: { id } }
         )
-            .then(rowsAffected => Product.findOne({ id }).then(product => res.status(201).send(product)))
+            .then(rowsAffected => Item.findOne({ id }).then(item => res.status(201).send(item)))
             .catch(error => res.status(400).send(error));
     },
     delete(req, res) {
         const id = req.params.id;
 
-        return Product.destroy({
+        return Item.destroy({
             where: {
                 id
             }
         })
             .then(() => res.status(200).send({ id }))
-            .catch( error => res.status(400).send(error));
+            .catch(error => res.status(400).send(error));
     }
 }

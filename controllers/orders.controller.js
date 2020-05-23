@@ -1,10 +1,10 @@
-const Product = require('../models').Product;
+const Order = require('../models').Order;
 
 module.exports = {
     fetch(req, res) {
-        return Product.findAll()
-            .then(products => {
-                res.status(200).send(products);
+        return Order.findAll()
+            .then(orders => {
+                res.status(200).send(orders);
             })
             .catch(error => {
                 res.status(400).send(error);
@@ -13,9 +13,14 @@ module.exports = {
     create(req, res) {
         const data = Object.assign({}, req.body);
 
-        return Product.create(data)
-            .then(product => {
-                res.status(201).send(product);
+        data.requested_time = new Date();
+        data.description = '';
+        data.payment_type = data.payment_type ? data.payment_type : 'cash';
+        data.amount = data.amount ? data.amount : 0;
+
+        return Order.create(data)
+            .then(order => {
+                res.status(201).send(order);
             })
             .catch(error => {
                 res.status(400).send(error);
@@ -23,21 +28,20 @@ module.exports = {
     },
     update(req, res) {
         const id = req.params.id;
-        const password = req.body.password && req.body.password != "" ? bcrypt.hashSync(req.body.password, 10) : "";
-        const data = Object.assign({}, req.body, { password });
+        const data = Object.assign({}, req.body);
         delete data.id;
 
-        return Product.update(
+        return Order.update(
             data,
             { where: { id } }
         )
-            .then(rowsAffected => Product.findOne({ id }).then(product => res.status(201).send(product)))
+            .then(rowsAffected => Order.findOne({ id }).then(order => res.status(201).send(order)))
             .catch(error => res.status(400).send(error));
     },
     delete(req, res) {
         const id = req.params.id;
 
-        return Product.destroy({
+        return Order.destroy({
             where: {
                 id
             }

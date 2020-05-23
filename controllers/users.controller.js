@@ -46,7 +46,11 @@ module.exports = {
     delete(req, res) {
         const id = req.params.id;
 
-        return User.delete(id)
+        return User.destroy({
+            where: {
+                id
+            }
+        })
             .then(() => res.status(200).send({ id }))
             .catch( error => res.status(400).send(error));
     }
