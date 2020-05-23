@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
     price: DataTypes.DECIMAL(10,2)
   }, {});
   Product.associate = function(models) {
-    // associations can be defined here
+    models.Product.belongsToMany(models.User, { through: 'Favorites', foreignKey: 'product_id', otherKey: 'user_id', as: 'users' });
   };
   return Product;
 };

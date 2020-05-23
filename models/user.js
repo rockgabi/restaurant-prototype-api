@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     admin: DataTypes.BOOLEAN
   }, {});
   User.associate = function(models) {
-    // associations can be defined here
+    models.User.belongsToMany(models.Product, { through: 'Favorite', foreignKey: 'user_id', otherKey: 'product_id', as: 'products' });
   };
   return User;
 };

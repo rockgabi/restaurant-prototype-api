@@ -1,17 +1,11 @@
 const bcrypt = require('bcrypt');
-const User = require('../models').User;
 const Product = require('../models').Product;
 
 module.exports = {
     fetch(req, res) {
-        return User.findAll({ 
-            include: [{
-                model: Product,
-                attributes: ['name', 'description', 'price']
-            }]
-        })
-            .then(users => {
-                res.status(200).send(users);
+        return Product.findAll()
+            .then(products => {
+                res.status(200).send(products);
             })
             .catch(error => {
                 res.status(400).send(error);
@@ -22,9 +16,9 @@ module.exports = {
         const data = Object.assign({}, req.body);
         data.password = password;
 
-        return User.create(data)
-            .then(user => {
-                res.status(201).send(user);
+        return Product.create(data)
+            .then(product => {
+                res.status(201).send(product);
             })
             .catch(error => {
                 res.status(400).send(error);
@@ -36,17 +30,17 @@ module.exports = {
         const data = Object.assign({}, req.body, { password });
         delete data.id;
 
-        return User.update(
+        return Product.update(
             data,
             { where: { id } }
         )
-            .then(rowsAffected => User.findOne({ id }).then(user => res.status(201).send(user)))
+            .then(rowsAffected => Product.findOne({ id }).then(product => res.status(201).send(product)))
             .catch(error => res.status(400).send(error));
     },
     delete(req, res) {
         const id = req.params.id;
 
-        return User.delete(id)
+        return Product.delete(id)
             .then(() => res.status(200).send({ id }))
             .catch( error => res.status(400).send(error));
     }
