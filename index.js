@@ -12,6 +12,8 @@ const favoritesController = require('./controllers').favorites;
 const statusesController = require('./controllers').statuses;
 const ordersController = require('./controllers').orders;
 
+const User = require('./models').User;
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -27,11 +29,17 @@ function authenticateToken(req, res, next) {
     if (token == null) return res.sendStatus(401) // if there isn't any token
 
     jwt.verify(token, config.token_secret, (err, user) => {
-        console.log(user)
-        if (err) return res.sendStatus(403);
+        if (!user) return res.sendStatus(403);
         req.user = user;
         next(); // pass the execution off to whatever request the client intended
     });
+}
+
+async function restrictAdmin(req, res, next) {
+    const user = await User.findByPk(req.user.id);
+    if (!user || !user.admin) return res.sendStatus(403);
+    req.user = user;
+    next(); // pass the execution off to whatever request the client intended
 }
 
 app.get('/', function (req, res) {
@@ -42,27 +50,27 @@ app.post('/login', authController.login);
 
 app.post('/register', authController.register);
 
-app.get('/users', authenticateToken, usersController.fetch);
-app.post('/users', usersController.create);
-app.put('/users/:id', usersController.update);
-app.delete('/users/:id', usersController.delete);
+app.get('/users', authenticateToken, restrictAdmin, usersController.fetch);
+app.post('/users', authenticateToken, restrictAdmin, usersController.create);
+app.put('/users/:id', authenticateToken, restrictAdmin, usersController.update);
+app.delete('/users/:id', authenticateToken, restrictAdmin, usersController.delete);
 
-app.get('/products', productsController.fetch);
-app.post('/products', productsController.create);
-app.put('/products/:id', productsController.update);
-app.delete('/products/:id', productsController.delete);
+app.get('/products', authenticateToken, productsController.fetch);
+app.post('/products', authenticateToken, productsController.create);
+app.put('/products/:id', authenticateToken, productsController.update);
+app.delete('/products/:id', authenticateToken, productsController.delete);
 
-app.get('/statuses', statusesController.fetch);
-app.post('/statuses', statusesController.create);
-app.put('/statuses/:id', statusesController.update);
-app.delete('/statuses/:id', statusesController.delete);
+app.get('/statuses', authenticateToken, statusesController.fetch);
+app.post('/statuses', authenticateToken, statusesController.create);
+app.put('/statuses/:id', authenticateToken, statusesController.update);
+app.delete('/statuses/:id', authenticateToken, statusesController.delete);
 
-app.get('/orders', ordersController.fetch);
-app.post('/orders', ordersController.create);
-app.put('/orders/:id', ordersController.update);
-app.delete('/orders/:id', ordersController.delete);
+app.get('/orders', authenticateToken, ordersController.fetch);
+app.post('/orders', authenticateToken, ordersController.create);
+app.put('/orders/:id', authenticateToken, ordersController.update);
+app.delete('/orders/:id', authenticateToken, ordersController.delete);
 
-app.get('/users/:user_id/favorites', favoritesController.fetch);
-app.post('/users/:user_id/favorites', favoritesController.create);
-app.delete('/users/:user_id/favorites', favoritesController.delete);
+app.get('/users/:user_id/favorites', authenticateToken, favoritesController.fetch);
+app.post('/users/:user_id/favorites', authenticateToken, favoritesController.create);
+app.delete('/users/:user_id/favorites', authenticateToken, favoritesController.delete);
 
