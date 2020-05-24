@@ -1,14 +1,18 @@
 const bcrypt = require('bcrypt');
 const User = require('../models').User;
 const Product = require('../models').Product;
+const Favorite = require('../models').Favorite;
 
 module.exports = {
     fetch(req, res) {
         return User.findAll({ 
-            include: [{
-                model: Product,
-                attributes: ['name', 'description', 'price']
-            }]
+            include: [
+                { model: Product, as: 'products', through: 
+                    {
+                        model: Favorite,
+                    } 
+                }
+            ]
         })
             .then(users => {
                 res.status(200).send(users);
