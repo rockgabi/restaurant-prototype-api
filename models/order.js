@@ -1,7 +1,6 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   const Order = sequelize.define('Order', {
-    time: DataTypes.STRING,
     user_id: DataTypes.INTEGER,
     status_id: DataTypes.INTEGER,
     requested_time: DataTypes.DATE,

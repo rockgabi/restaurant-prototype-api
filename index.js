@@ -11,6 +11,7 @@ const productsController = require('./controllers').products;
 const favoritesController = require('./controllers').favorites;
 const statusesController = require('./controllers').statuses;
 const ordersController = require('./controllers').orders;
+const itemsController = require('./controllers').items;
 
 const User = require('./models').User;
 
@@ -35,6 +36,7 @@ function authenticateToken(req, res, next) {
     });
 }
 
+// Admin role middleware
 async function restrictAdmin(req, res, next) {
     const user = await User.findByPk(req.user.id);
     if (!user || !user.admin) return res.sendStatus(403);
@@ -65,10 +67,18 @@ app.post('/statuses', authenticateToken, statusesController.create);
 app.put('/statuses/:id', authenticateToken, statusesController.update);
 app.delete('/statuses/:id', authenticateToken, statusesController.delete);
 
-app.get('/orders', authenticateToken, ordersController.fetch);
-app.post('/orders', authenticateToken, ordersController.create);
-app.put('/orders/:id', authenticateToken, ordersController.update);
-app.delete('/orders/:id', authenticateToken, ordersController.delete);
+app.get('/orders', authenticateToken, restrictAdmin, ordersController.fetch);
+app.get('/me/orders', authenticateToken, ordersController.userFetch);
+app.post('/orders', authenticateToken, restrictAdmin, ordersController.create);
+app.post('/me/orders', authenticateToken, ordersController.userCreate);
+app.put('/orders/:id', authenticateToken, restrictAdmin, ordersController.update);
+app.put('/me/orders/:id', authenticateToken, ordersController.userUpdate);
+app.delete('/orders/:id', authenticateToken, restrictAdmin, ordersController.delete);
+app.delete('/me/orders/:id', authenticateToken, ordersController.userDelete);
+
+app.post('/me/orders/:order_id/items', authenticateToken, itemsController.userCreate);
+app.put('/me/orders/:order_id/items/:id', authenticateToken, itemsController.userUpdate);
+app.delete('/me/orders/:order_id/items/:id', authenticateToken, itemsController.userDelete);
 
 app.get('/users/:user_id/favorites', authenticateToken, favoritesController.fetch);
 app.post('/users/:user_id/favorites', authenticateToken, favoritesController.create);
