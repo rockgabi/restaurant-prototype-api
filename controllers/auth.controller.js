@@ -15,19 +15,23 @@ module.exports = {
         const existingUser = await User.findOne({ where: { email } });
         const admin = req.body.admin ? req.body.admin : false;
 
-        if (existingUser) res.status(400).send({ error: 'email_in_use' });
+        if (existingUser) return res.status(409).send({ error: 'email_in_use' });
 
         const data = Object.assign({}, req.body, { admin });
         const password = req.body.password && req.body.password != "" ? bcrypt.hashSync(req.body.password, 10) : "";
         data.password = password;
 
-        const user = await User.create(data);
-        user = user.get();
-        delete user.password;
+        try {
+            const user = await User.create(data);
+            user = user.get();
+            delete user.password;
+        } catch (error) {
+            return res.status(401).send({ error: 'invalid_input' });
+        }
 
         const token = generateAccessToken(user);
 
-        return res.status(200).send({ token, user });
+        return res.status(201).send({ token, user });
     },
      
     async login(req, res) {

@@ -1,0 +1,153 @@
+openapi: 3.0.0
+# Added by API Auto Mocking Plugin
+servers:
+  - description: Development
+    url: http://localhost:3000
+info:
+  description: API for making delivery requests
+  version: "1.0.0"
+  title: Delilah Delivery API
+  contact:
+    email: gabi89.m@gmail.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+tags:
+  - name: Generic
+    description: Endpoints for all users
+  - name: Admins
+    description: Secured Admin-only calls
+
+paths:
+  /register:
+    post:
+      tags: 
+        - Generic
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object 
+              required:
+                - username
+                - email
+                - names
+                - address
+                - phone
+                - password
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                names:
+                  type: string
+                address:
+                  type: string
+                phone:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '201':
+          description: item created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token: 
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  user:
+                    $ref: '#/components/schemas/User'
+        '400':
+          description: invalid input, object invalid (invalid_input)
+        '409':
+          description: An existing item already exists (email_in_use)
+
+  /login:
+    post:
+      tags:
+        - Generic
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object 
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: User logged in
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token: 
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  user:
+                    $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid input, object invalid
+  /users:
+    get:
+      tags: 
+        - Admin
+      responses:
+        '200':
+          description: Gets all the users
+        
+
+          
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - id
+        - names
+        - email
+        - username
+        - phone
+        - address
+      properties:
+        id:
+          type: integer
+          example: 1
+        names:
+          type: string
+          example: Gabriel Medina
+        username:
+          type: string
+          example: nukkerone
+        email:
+          type: string
+          example: gabi89.m@gmail.com
+        phone:
+          type: string
+          example: +15492494541304
+        address:
+          type: string
+          example: Tandil 265, 14
+        admin:
+          type: boolean
+          example: false
+        created_at:
+          type: string
+          format: date-time
+          example: '2016-08-29T09:12:33.001Z'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2016-08-29T09:12:33.001Z'
